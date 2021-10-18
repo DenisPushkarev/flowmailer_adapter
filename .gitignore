@@ -1,0 +1,10 @@
+/_build/
+/cover/
+/deps/
+/doc/
+/.fetch
+erl_crash.dump
+*.ez
+flowmailer_adapter-*.tar
+/tmp/
+**/*.secret.exs
