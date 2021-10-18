@@ -21,8 +21,8 @@ defmodule Bamboo.FlowMailerAdapter do
     config
   end
 
-  defp send_path(config) do
-    account_id = FlowMailerHelper.get_config_value(config, :account_id)
+  defp send_path(_config) do
+    account_id = Application.fetch_env!(:flowmailer, :account_id)
     "#{account_id}/messages/submit"
   end
 
@@ -44,7 +44,6 @@ defmodule Bamboo.FlowMailerAdapter do
            ) do
         {:ok, status, _headers, response} when status > 299 ->
           filtered_params = body |> Bamboo.json_library().decode!()
-
           {:error, build_api_error(@service_name, response, filtered_params)}
 
         {:ok, status, headers, response} ->
@@ -59,7 +58,11 @@ defmodule Bamboo.FlowMailerAdapter do
   end
 
   defp headers(token) do
-    [{"Authorization", "Bearer #{token}"}, {"Accept", "Application/json; Charset=utf-8"}]
+    [
+      {"Authorization", "Bearer #{token}"},
+      {"Accept", "Application/json; Charset=utf-8"},
+      {"Content-Type", "application/json"}
+    ]
   end
 
   defp to_flowmailer_body(%Email{} = email, _config) do
@@ -161,14 +164,19 @@ defmodule Bamboo.FlowMailerAdapter do
   defp put_mime(message, _), do: message
 
   defp to_address({_, address}), do: address
+  defp to_address([{_, address} | _]), do: address
 
   defp put_recipient_address(message, %Email{to: to}) do
     Map.put(message, "recipientAddress", to_address(to))
   end
 
+  defp put_schedule_at(message, %Email{private: %{flowmailer_schedule_at: nil}}), do: message
+
   defp put_schedule_at(message, %Email{private: %{flowmailer_schedule_at: schedule_at}}) do
     Map.put(message, "scheduleAt", schedule_at)
   end
+
+  defp put_schedule_at(message, _), do: message
 
   defp put_sender_address(message, %Email{from: from}) do
     Map.put(message, "senderAddress", to_address(from))

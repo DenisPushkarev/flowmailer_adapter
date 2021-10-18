@@ -2,7 +2,6 @@ defmodule FlowMailer.Token do
   use GenServer
   alias FlowMailer.Token
   alias Bamboo.FlowMailerHelper
-  alias Bamboo.AdapterHelper
 
   @type t :: %__MODULE__{
           access_token: String.t(),
