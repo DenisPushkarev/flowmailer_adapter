@@ -1,8 +1,6 @@
 defmodule BambooFlowmailer.MixProject do
   use Mix.Project
 
-  @source_url "https://github.com/dipushkarev/bamboo_flowmailer"
-
   def project do
     [
       app: :bamboo_flowmailer,
@@ -19,7 +17,7 @@ defmodule BambooFlowmailer.MixProject do
       description: "FlowMailer adapter for Bamboo",
       maintainers: ["Denis Pushkarev <dipushkarev@gmail.com>"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/kalys/bamboo_ses"}
+      links: %{"GitHub" => "git@github.com:DenisPushkarev/flowmailer_adapter"}
     ]
   end
 
