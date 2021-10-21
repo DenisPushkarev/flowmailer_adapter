@@ -1,4 +1,6 @@
 defmodule FlowMailer.Shared do
+  @moduledoc false
+
   def hackney_opts(config) do
     config
     |> Map.get(:hackney_opts, [])

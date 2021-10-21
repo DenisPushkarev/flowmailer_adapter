@@ -1,13 +1,26 @@
 defmodule FlowMailer.Token do
+  @moduledoc """
+  Token manager for FlowMailer service.
+
+  It is a GenServer that manages FlowMailer authorization tokens, supports multiple accounts.
+  """
   use GenServer
   alias FlowMailer.Token
 
   import FlowMailer.Shared
 
+  @type t :: %__MODULE__{
+    updated_at: DateTime.t(),
+    access_token: AccessToken.t()
+  }
+
   defstruct updated_at: nil,
             access_token: nil
 
   defmodule AccessToken do
+    @moduledoc """
+    FlowMailer Access Token structure
+    """
     @type t :: %__MODULE__{
             access_token: String.t(),
             token_type: String.t(),

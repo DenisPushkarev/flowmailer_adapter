@@ -27,7 +27,7 @@ defmodule Bamboo.FlowMailerAdapter do
     "#{account_id}/messages/submit"
   end
 
-  def default_flowmailer_host(config) do
+  defp default_flowmailer_host(config) do
     get_config_value(config, :flowmailer_host, @default_flowmailer_host)
   end
 
