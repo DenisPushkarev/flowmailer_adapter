@@ -1,6 +1,8 @@
 defmodule BambooFlowmailer.MixProject do
   use Mix.Project
 
+  @source_url "git@github.com:DenisPushkarev/flowmailer_adapter"
+
   def project do
     [
       app: :bamboo_flowmailer,
@@ -8,16 +10,19 @@ defmodule BambooFlowmailer.MixProject do
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      description: "A Bamboo adapter for the FlowMailer email service",
+      source_url: @source_url,
       package: package()
     ]
   end
 
   defp package do
     [
+      name: :bamboo_flowmailer,
       description: "FlowMailer adapter for Bamboo",
       maintainers: ["Denis Pushkarev <dipushkarev@gmail.com>"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "git@github.com:DenisPushkarev/flowmailer_adapter"}
+      links: %{"GitHub" => @source_url}
     ]
   end
 

@@ -4,9 +4,9 @@ defmodule Bamboo.FlowMailerAdapter do
   Use this adapter to send emails through FlowMailer API.
   """
   alias Bamboo.Email
-  alias Bamboo.FlowMailerHelper
-  import Bamboo.ApiError
   alias FlowMailer.Token
+  import Bamboo.ApiError
+  import FlowMailer.Shared
 
   @behaviour Bamboo.Adapter
 
@@ -18,46 +18,52 @@ defmodule Bamboo.FlowMailerAdapter do
 
   @doc false
   def handle_config(config) do
+    Token.handle_config(config)
     config
   end
 
-  defp send_path(_config) do
-    account_id = Application.fetch_env!(:flowmailer, :account_id)
+  defp send_path(config) do
+    account_id = get_config_value(config, :flowmailer_account_id)
     "#{account_id}/messages/submit"
   end
 
   def default_flowmailer_host(config) do
-    FlowMailerHelper.get_config_value(config, :flowmailer_host, @default_flowmailer_host)
+    get_config_value(config, :flowmailer_host, @default_flowmailer_host)
   end
 
   def deliver(email, config) do
-    try do
-      body = email |> to_flowmailer_body(config) |> Bamboo.json_library().encode!()
-      url = default_flowmailer_host(config) |> URI.merge(send_path(config)) |> to_string()
-      {:ok, %Token{} = token} = Token.get()
+    body = email |> to_flowmailer_body(config) |> Bamboo.json_library().encode!()
+    url = default_flowmailer_host(config) |> URI.merge(send_path(config)) |> to_string()
+    token = get_token!(config)
 
-      case :hackney.post(
-             url,
-             headers(token.access_token),
-             body,
-             FlowMailerHelper.hackney_opts(config)
-           ) do
-        {:ok, status, _headers, response} when status > 299 ->
-          filtered_params = body |> Bamboo.json_library().decode!()
-          {:error, build_api_error(@service_name, response, filtered_params)}
+    case :hackney.post(
+           url,
+           headers_with_token(token),
+           body,
+           hackney_opts(config)
+         ) do
+      {:ok, status, _headers, response} when status > 299 ->
+        filtered_params = body |> Bamboo.json_library().decode!()
+        {:error, build_api_error(@service_name, response, filtered_params)}
 
-        {:ok, status, headers, response} ->
-          {:ok, %{status_code: status, headers: headers, body: response}}
+      {:ok, status, headers, response} ->
+        {:ok, %{status_code: status, headers: headers, body: response}}
 
-        {:error, reason} ->
-          {:error, build_api_error(inspect(reason))}
-      end
-    catch
-      :throw, {:error, _} = error -> error
+      {:error, reason} ->
+        {:error, build_api_error(inspect(reason))}
+    end
+  catch
+    :throw, {:error, _} = error -> error
+  end
+
+  defp get_token!(config) do
+    case Token.get(config) do
+      {:ok, token} -> token
+      {:error, reason} -> raise "Token error: #{inspect(reason)}"
     end
   end
 
-  defp headers(token) do
+  defp headers_with_token(token) do
     [
       {"Authorization", "Bearer #{token}"},
       {"Accept", "Application/json; Charset=utf-8"},
@@ -165,6 +171,7 @@ defmodule Bamboo.FlowMailerAdapter do
 
   defp to_address({_, address}), do: address
   defp to_address([{_, address} | _]), do: address
+  defp to_address(nil), do: nil
 
   defp put_recipient_address(message, %Email{to: to}) do
     Map.put(message, "recipientAddress", to_address(to))
