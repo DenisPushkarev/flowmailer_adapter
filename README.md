@@ -1,9 +1,10 @@
 # FlowmailerAdapter
 
 A [FlowMailer](https://flowmailer.com/) Adapter for the [Bamboo](https://github.com/thoughtbot/bamboo) email app.
+
 ## Installation
 
-1. add dependency in your `mix.exs`:
+1. Add dependency in your `mix.exs`:
 
 ```elixir
 def deps do
@@ -76,6 +77,4 @@ defmodule MyApp.Mail do
 end
 ```
 
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [https://hexdocs.pm/flowmailer_adapter](https://hexdocs.pm/flowmailer_adapter).
+Documentation published on [https://hexdocs.pm/flowmailer_adapter](https://hexdocs.pm/flowmailer_adapter).
