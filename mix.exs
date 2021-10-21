@@ -1,7 +1,7 @@
 defmodule BambooFlowmailer.MixProject do
   use Mix.Project
 
-  @source_url "git@github.com:DenisPushkarev/flowmailer_adapter"
+  @source_url "https://github.com/DenisPushkarev/flowmailer_adapter"
 
   def project do
     [
@@ -34,6 +34,10 @@ defmodule BambooFlowmailer.MixProject do
   end
 
   defp deps do
-    [{:bamboo, "~> 2.0"}, {:jason, "~> 1.2"}]
+    [
+      {:bamboo, "~> 2.0"},
+      {:jason, "~> 1.2"},
+      {:ex_doc, "> 0.0.0", only: :dev, runtime: false}
+    ]
   end
 end
