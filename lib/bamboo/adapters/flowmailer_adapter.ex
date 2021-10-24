@@ -134,7 +134,11 @@ defmodule Bamboo.FlowMailerAdapter do
 
   defp put_header_from_address(message, %Email{}), do: message
 
-  defp put_header_from_name(message, _), do: message
+  defp put_header_from_name(message, %Email{from: {name, _email}}) when is_binary(name) do
+    Map.put(message, "headerFromName", name)
+  end
+
+  defp put_header_from_name(message, %Email{}), do: message
 
   defp put_header_to_address(message, %Email{headers: %{"To" => to}}) do
     Map.put(message, "headerToAddress", to)
@@ -146,7 +150,11 @@ defmodule Bamboo.FlowMailerAdapter do
 
   defp put_header_to_address(message, _), do: message
 
-  defp put_header_to_name(message, _), do: message
+  defp put_header_to_name(message, %Email{to: {name, _email}}) when is_binary(name) do
+    Map.put(message, "headerToName", name)
+  end
+
+  defp put_header_to_name(message, %Email{}), do: message
 
   defp put_headers(message, %Email{headers: headers}) when is_map(headers) do
     headers_without_tuple_values =
@@ -168,10 +176,6 @@ defmodule Bamboo.FlowMailerAdapter do
   end
 
   defp put_mime(message, _), do: message
-
-  defp to_address({_, address}), do: address
-  defp to_address([{_, address} | _]), do: address
-  defp to_address(nil), do: nil
 
   defp put_recipient_address(message, %Email{to: to}) do
     Map.put(message, "recipientAddress", to_address(to))
@@ -206,4 +210,8 @@ defmodule Bamboo.FlowMailerAdapter do
   defp put_text(message, %Email{text_body: text}) do
     Map.put(message, "text", text)
   end
+
+  defp to_address({_, address}), do: address
+  defp to_address([{_, address} | _]), do: address
+  defp to_address(nil), do: nil
 end
